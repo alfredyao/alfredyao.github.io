@@ -29,6 +29,18 @@
             <h2>Resume</h2>
             <p><a href="Shunyu_Yao_CV.pdf" download="Shunyu_Yao_CV.pdf">Download My Resume (PDF)</a></p>
         </section>
+
+            <section id="blog">
+        <h2>Latest Posts</h2>
+        {% for post in site.posts limit:3 %}
+            <article>
+                <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
+                <p>{{ post.date | date: "%B %d, %Y" }}</p>
+                <p>{{ post.excerpt }}</p>
+            </article>
+        {% endfor %}
+        <a href="/blog">View all posts →</a>
+    </section>
         
         <section id="contact">
             <h2>Contact</h2>
