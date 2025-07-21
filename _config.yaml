@@ -1,0 +1,14 @@
+title: Shunyu Yao
+description: Research Scientist at Anthropic
+url: https://alfredyao.github.io
+author: Shunyu Yao
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
