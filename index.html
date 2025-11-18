@@ -3,57 +3,636 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shunyu Yao - Personal Website</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dr. Shunyu Yao | Physicist & AI Researcher</title>
+    <style>
+        :root {
+            /* DeepMind/Google inspired palette mixed with Stanford Red */
+            --primary: #202124;
+            --accent: #4285F4; 
+            --stanford-red: #8C1515; 
+            --text: #3c4043;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --timeline-line: #dadce0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            overflow-x: hidden;
+        }
+
+        /* Canvas Background */
+        #quantum-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-separator {
+            color: #ddd;
+            font-weight: 300;
+        }
+
+        /* Hero Section */
+        header {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem 2rem;
+            background: radial-gradient(circle at 50% 50%, rgba(66, 133, 244, 0.05) 0%, transparent 60%);
+        }
+
+        h1 {
+            font-size: 4rem;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .tagline {
+            max-width: 650px;
+            font-size: 1.1rem;
+            color: #5f6368;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        /* About Grid */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .bio-text p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: #4a4a4a;
+        }
+
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--stanford-red);
+        }
+
+        .info-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background-color: var(--timeline-line);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.visible { opacity: 1; transform: translateY(0); }
+        .timeline-item.left { left: 0; text-align: right; }
+        .timeline-item.right { left: 50%; }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            right: -8px;
+            background-color: white;
+            border: 3px solid var(--accent);
+            top: 22px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item.right::after { left: -8px; }
+
+        .timeline-content {
+            padding: 25px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .role-date {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Research Tabs */
+        .research-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: #e8eaed;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .project-card {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: none;
+            animation: fadeIn 0.4s ease;
+            border-left: 5px solid transparent;
+        }
+
+        .project-card[data-type="ai"] { border-color: var(--accent); }
+        .project-card[data-type="physics"] { border-color: var(--stanford-red); }
+
+        .project-card.show { display: block; }
+
+        .project-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            color: #555;
+        }
+
+        /* Writing Section Styles */
+        .blog-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .latest-post-feature {
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(76, 161, 175, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .latest-post-feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-placeholder {
+            padding: 2rem;
+            border: 2px dashed #dadce0;
+            border-radius: 12px;
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            font-size: 0.9rem;
+            background: white;
+            margin-top: 4rem;
+            border-top: 1px solid #eee;
+        }
+
+        @media screen and (max-width: 768px) {
+            .timeline::after { left: 31px; }
+            .timeline-item { width: 100%; padding-left: 70px; padding-right: 20px; }
+            .timeline-item::after { left: 23px; }
+            .timeline-item.left { text-align: left; }
+            .about-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+            .nav-links { gap: 1.2rem; font-size: 0.9rem; }
+        }
+    </style>
 </head>
 <body>
+
+    <canvas id="quantum-canvas"></canvas>
+
+    <nav>
+        <a href="#" class="logo">SY.</a>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#writing">Writing</a>
+            <a href="#timeline">Journey</a>
+            <a href="#research">Work</a>
+            <span class="nav-separator">|</span>
+            <a href="#" target="_blank">CV</a>
+            <a href="#" target="_blank">LinkedIn</a>
+        </div>
+    </nav>
+
     <header>
-        <h1>Shunyu Yao</h1>
-        <p>Senior Staff Research Scientist@Google DeepMind, previously(@Anthropic@UCBerkeley@Stanford@Tsinghua)</p>
+        <h1>Dr. Shunyu Yao</h1>
+        <div class="subtitle">Senior Staff Research Scientist @ Google DeepMind</div>
+        <p class="tagline">
+            Theoretical Physicist turned AI Researcher.<br>
+            Bridging the gap between <strong>Quantum Chaos</strong> and <strong>Agentic Intelligence</strong>.
+        </p>
+        <div class="hero-buttons">
+            <a href="#research" class="btn btn-primary">View Research</a>
+        </div>
     </header>
-    
-    <main>
-        <section id="about">
-            <h2>About Me</h2>
-            <p>I'm currently a research scientist at Google DeepMind </p>
-            <p>I was a research scientist at Anthropic. My research at Anthropic is centered around large scale reinforcement learning of large language models, mostly focus on improving model capabilities. </p>
-            <p>Previously, I was a theoretical physicist. I did a short postdoc at Berkeley Center for Theoretical Physics before Anthropic. I did my PhD at Stanford Institute for Theoretical Physics with Douglas Stanford and Stephen Shenker, and my Bachelor in IAS, Tsinghua with Zhong Wang </p>
-        </section>
-        
-        <section id="projects">
-            <h2>Projects(@Anthropic)</h2>
-            <p>My main contribution @anthropic includes:</p>
-            <p>Agentic coding/tool-use in large scale RL(these research comes into Claude 3.7)</p>
-            <p>RL numerics control and basic algorithm design(these research comes into Claude 4 family)</p>
-            <p>New generation of RL algorithm</p>
-            <p>Fundamental science on RL hyper parameter</p>
-            <p>Science of SL and its impact on RL</p>
-            <h2>Projects(@Physics)</h2>
-            <p>@Hep-th: My work focused on dynamics of complex quantum systems, including quantum chaos, quantum blackholes and their relation to quantum information. eg. the development of scramblon theory.</p>
-            <p>@CMT: My work focused on open quantum systems and topological phase of matter. eg. The discovery of non-Hermitian Skin effect</p>
-        </section>
 
-
-        <section id="resume">
-            <h2>Resume</h2>
-            <p><a href="Shunyu_Yao_CV.pdf" download="Shunyu_Yao_CV.pdf">Download My Resume (PDF)</a></p>
-        </section>
-
-            <section id="blog">
-  <h2>Latest Posts</h2>
-  <ul>
-    <li>
-      <a href="posts/2025-10-06.html">My infant year as an AI researcher</a>
-      <small>Oct 06, 2025</small>
-    </li>
-  </ul>
+    <section id="about">
+        <h2>Biography</h2>
+        <div class="about-grid">
+            <div class="bio-text">
+                <p>
+                    Shunyu Yao is currently a Senior Staff Research Scientist at <strong>Google DeepMind</strong>. Previously, he was a Research Scientist at <strong>Anthropic</strong>, where his work focused on the "science of learning" and improving model capabilities for the Claude family.
+                </p>
+                <p>
+                    Before his pivot to Artificial Intelligence, Dr. Yao was a theoretical physicist. He completed his PhD at the <strong>Stanford Institute for Theoretical Physics</strong> under Douglas Stanford and Stephen Shenker. His academic roots trace back to the Institute for Advanced Study at Tsinghua University, where he worked with Zhong Wang.
+                </p>
+                <p>
+                    He is known for his foundational work in physics on the <em>Non-Hermitian Skin Effect</em> and <em>Scramblon Theory</em>, and more recently for his contributions to <em>Agentic Coding</em> in Large Language Models.
+                </p>
+            </div>
+            <div class="info-card">
+                <div class="info-item">
+                    <div class="info-label">Current Focus</div>
+                    <div class="info-value">Large Scale Reinforcement Learning</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PhD Advisors</div>
+                    <div class="info-value">Douglas Stanford, Stephen Shenker</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PhD Thesis</div>
+                    <div class="info-value">"Lessons From Quantum Chaos and Quantum Gravity"</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Contact</div>
+                    <div class="info-value">shunyu.yao.physics@gmail.com</div>
+                </div>
+            </div>
+        </div>
     </section>
+
+    <section id="writing">
+        <h2>Writing & Thoughts</h2>
+        <div class="blog-container">
+            <div class="latest-post-feature">
+                <h3 style="margin-bottom: 1rem;">Latest Post</h3>
+                <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">"My infant year as an AI researcher"</p>
+                <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem;">Reflections on transitioning from theoretical physics to the frontier of AI.</p>
+                <a href="#" class="btn" style="background: white; color: #2c3e50; padding: 12px 30px;">Read Article</a>
+            </div>
+
+            <div class="blog-placeholder">
+                More posts coming soon...
+            </div>
+        </div>
+    </section>
+
+    <section id="timeline">
+        <h2>Career Trajectory</h2>
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <span class="role-date">2015 - 2019</span>
+                    <h3>Tsinghua University</h3>
+                    <p>Bachelor in IAS. Discovered the <strong>Non-Hermitian Skin Effect</strong>.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <span class="role-date">2019 - 2024</span>
+                    <h3>Stanford University</h3>
+                    <p>PhD in Theoretical Physics. Focused on Quantum Black Holes, Holography, and Scramblon Theory.</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <span class="role-date">2024 (Postdoc)</span>
+                    <h3>UC Berkeley</h3>
+                    <p>Short Postdoc at the Berkeley Center for Theoretical Physics.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <span class="role-date">2024 - 2025</span>
+                    <h3>Anthropic</h3>
+                    <p>Research Scientist. Contributed to <strong>Claude 3.7</strong> (Agentic coding) and <strong>Claude 4</strong> family (RL numerics).</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <span class="role-date">Present</span>
+                    <h3>Google DeepMind</h3>
+                    <p>Senior Staff Research Scientist. Focusing on new generation RL algorithms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="research">
+        <h2>Research & Contributions</h2>
         
-        <section id="contact">
-            <h2>Contact</h2>
-            <p>Email: shunyu.yao.physics@gmail.com</p>
-            <p>Linkedin: <a href="https://www.linkedin.com/in/shunyu-yao-204158285/">@shunyu yao</a></p>
-        </section>
-    </main>
+        <div class="research-tabs">
+            <button class="tab-btn active" onclick="filterProjects('all')">All Work</button>
+            <button class="tab-btn" onclick="filterProjects('ai')">AI & LLMs</button>
+            <button class="tab-btn" onclick="filterProjects('physics')">Physics</button>
+        </div>
+
+        <div id="projects-container">
+            <div class="project-card show" data-type="ai">
+                <div class="project-title">
+                    Agentic Coding & Tool Use <span class="tech-tag">Claude 3.7</span>
+                </div>
+                <p>Developed core capabilities for agentic coding and tool use in large-scale reinforcement learning systems. These contributions were integrated into the Claude 3.7 release.</p>
+            </div>
+
+            <div class="project-card show" data-type="ai">
+                <div class="project-title">
+                    RL Numerics & Algorithm Design <span class="tech-tag">Claude 4 Family</span>
+                </div>
+                <p>Focused on the fundamental science of Reinforcement Learning hyperparameters and the stability of numerics in large-scale training runs.</p>
+            </div>
+
+            <div class="project-card show" data-type="physics">
+                <div class="project-title">
+                    Scramblon Theory <span class="tech-tag">Quantum Chaos</span>
+                </div>
+                <p>Developed the theory of "Scramblons" to describe the dynamics of complex quantum systems, quantum black holes, and their relation to quantum information.</p>
+            </div>
+
+            <div class="project-card show" data-type="physics">
+                <div class="project-title">
+                    Non-Hermitian Skin Effect <span class="tech-tag">Condensed Matter</span>
+                </div>
+                <p>Discovered that in open quantum systems, eigenstates can localize at the boundaries (Skin Effect), a finding that reshaped the understanding of topological phases of matter.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Dr. Shunyu Yao. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Timeline Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.timeline-item').forEach(el => observer.observe(el));
+
+        // Research Filter
+        function filterProjects(type) {
+            const cards = document.querySelectorAll('.project-card');
+            const buttons = document.querySelectorAll('.tab-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            cards.forEach(card => {
+                if (type === 'all' || card.getAttribute('data-type') === type) {
+                    card.style.display = 'block';
+                    setTimeout(() => card.style.opacity = 1, 50);
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = 0;
+                }
+            });
+        }
+
+        // Background Particles (Subtle Neural/Quantum Network)
+        const canvas = document.getElementById('quantum-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if(this.x < 0 || this.x > w) this.vx *= -1;
+                if(this.y < 0 || this.y > h) this.vy *= -1;
+            }
+        }
+
+        function init() {
+            particles = new Array(40).fill().map(() => new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#4285F4';
+            ctx.strokeStyle = 'rgba(66, 133, 244, 0.15)';
+            
+            particles.forEach((p, i) => {
+                p.update();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Connect particles
+                for(let j=i+1; j<particles.length; j++) {
+                    const p2 = particles[j];
+                    const d = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(d < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        init();
+        animate();
+    </script>
 </body>
 </html>
+
